@@ -1,0 +1,1 @@
+{ header : {length:67 , voice : [{ type :"audio/mpeg", url: "http://s3.mayiming.net.cn/common/upload/audio/audio1409819431.mp3"} , {type :"audio/wav", url: "http://s3.mayiming.net.cn/common/upload/audio/audio1409819431.wav"}]},data : []}
