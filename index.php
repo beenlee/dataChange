@@ -15,18 +15,20 @@ echo json_last_error_msg();
 exit();
 */
 /*
-$records =  new RecordData();
-$records->set_audioOffset(1)->set_height(1)->set_version(1)->set_width(1);
-print_r($records);
-$records->clear();
+
 print_r($records);
 */
 
 $srcDir = new DirectoryIterator("srcData");
 //print_r($srcDir);
+
+//统计记录
 $total = 0;
 $err_num = 0;
 $success_num = 0;
+
+$records =  new RecordData();
+
 while( $srcDir->valid() ){
 	if($srcDir->isFile()){
 		if( $srcDir->getExtension() == "txt" ){
@@ -51,7 +53,7 @@ while( $srcDir->valid() ){
 				//echo $contents;
 				$dataArr = json_decode($contents,true);
 				echo "->";
-				if($dataArr == null ){
+				if($dataArr == null || !is_array($dataArr) ){
 					echo "json文件为空或格式错误！";
 					echo json_last_error();
 					echo json_last_error_msg();
@@ -59,9 +61,35 @@ while( $srcDir->valid() ){
 					//echo $contents;
 					//echo "</br>======</br>";
 					$err_num++;
+					//exit();
 				}else{
+					//print_r($dataArr);
 					echo "正在转码...";
-					$success_num++;
+					$records->set_audioOffset("0.000000")->set_height("0.000000")->set_version("1.0.0.0")->set_width("0.000000");
+					//print_r($records);
+					
+					foreach($dataArr["data"] as $val){
+						$records->parser_and_add_records($val);
+					}
+					
+					$info = $records->to_json();
+					$records->clear();
+					
+					$handle  =  fopen (  "destData/".$srcDir->getFilename(),  "a+" );
+					if($handle == false){
+						echo "->"."打开目标文件 destData/".$srcDir->getFilename()."失败！";
+						$err_num++;
+					}else{
+						if( fwrite($handle, $info) === false ){
+							echo "->写入文件失败！";
+						}else{
+							echo "->success!";
+						}
+						fclose ( $handle );
+						$success_num++;
+					}
+					
+					//exit();
 				}
 				//exit();
 				//echo "</br>======</br>";
